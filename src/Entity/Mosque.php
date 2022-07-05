@@ -33,9 +33,17 @@ class Mosque
     #[ORM\ManyToMany(targetEntity: Facility::class, mappedBy: 'Mosque')]
     private $facilities;
 
+    #[ORM\OneToMany(mappedBy: 'mosque', targetEntity: Photo::class)]
+    private $photos;
+
+    #[ORM\ManyToMany(targetEntity: Khateeb::class, mappedBy: 'mosque')]
+    private $khateebs;
+
     public function __construct()
     {
         $this->facilities = new ArrayCollection();
+        $this->photos = new ArrayCollection();
+        $this->khateebs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -125,6 +133,63 @@ class Mosque
     {
         if ($this->facilities->removeElement($facility)) {
             $facility->removeMosque($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Photo>
+     */
+    public function getPhotos(): Collection
+    {
+        return $this->photos;
+    }
+
+    public function addPhoto(Photo $photo): self
+    {
+        if (!$this->photos->contains($photo)) {
+            $this->photos[] = $photo;
+            $photo->setMosque($this);
+        }
+
+        return $this;
+    }
+
+    public function removePhoto(Photo $photo): self
+    {
+        if ($this->photos->removeElement($photo)) {
+            // set the owning side to null (unless already changed)
+            if ($photo->getMosque() === $this) {
+                $photo->setMosque(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Khateeb>
+     */
+    public function getKhateebs(): Collection
+    {
+        return $this->khateebs;
+    }
+
+    public function addKhateeb(Khateeb $khateeb): self
+    {
+        if (!$this->khateebs->contains($khateeb)) {
+            $this->khateebs[] = $khateeb;
+            $khateeb->addMosque($this);
+        }
+
+        return $this;
+    }
+
+    public function removeKhateeb(Khateeb $khateeb): self
+    {
+        if ($this->khateebs->removeElement($khateeb)) {
+            $khateeb->removeMosque($this);
         }
 
         return $this;

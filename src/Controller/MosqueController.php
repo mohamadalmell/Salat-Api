@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Mosque;
+use App\Repository\FacilityRepository;
+use App\Repository\KhateebRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 // use Symfony\Component\HttpFoundation\Response;
@@ -16,10 +18,14 @@ use Symfony\Component\HttpFoundation\Request;
 class MosqueController extends AbstractController
 {
     private $mosqueRepository;
+    private $facilityRepository;
+    private $khateebRepository;
 
-    public function __construct(MosqueRepository $mosqueRepository)
+    public function __construct(MosqueRepository $mosqueRepository, FacilityRepository $facilityRepository, KhateebRepository $khateebRepository)
     {
-        $this->mosqueRepository = $mosqueRepository;    
+        $this->mosqueRepository = $mosqueRepository;
+        $this->facilityRepository = $facilityRepository;
+        $this->khateebRepository = $khateebRepository;
     }
 
     #[Route('/api/mosques', name: 'GetAll', methods: ['GET'])]
@@ -29,10 +35,9 @@ class MosqueController extends AbstractController
 
         return $this->json([
             'success' => true,
-            JsonResponse::HTTP_OK,
             'message' => 'All Mosques',
             'data' => $mosques,
-        ]); 
+        ], JsonResponse::HTTP_OK); 
     }
 
     #[Route('/api/mosques/{id}', name: 'getOne', methods: ['GET'])]
@@ -40,6 +45,14 @@ class MosqueController extends AbstractController
     {
         $mosque = $this->mosqueRepository->find($id);
 
+        if (!$mosque) {
+            return $this->json([    
+                'success' => false,
+                'message' => "No mosque found for id $id",
+                'data' => null,
+            ], JsonResponse::HTTP_NOT_FOUND);
+        }
+        
         //Listing relational arrays
         $khateebsList = [];
         $facilitiesList = [];
@@ -62,34 +75,35 @@ class MosqueController extends AbstractController
         $mosque->khateebs = $khateebsList;
         $mosque->facilities = $facilitiesList;
 
-        if (!$mosque) {
-            return $this->json([    
-                'success' => false,
-                JsonResponse::HTTP_NOT_FOUND,
-                'message' => "No mosque found for id $id",
-                'data' => null,
-            ], 404);
-        }
 
         return $this->json([
             'success' => true,
-            JsonResponse::HTTP_OK,
             'message' => 'One Mosque',
             'data' => $mosque,
-        ]); 
+        ], JsonResponse::HTTP_OK); 
     }
 
     #[Route('/api/mosques', name: 'create', methods: ['POST'])]
     public function createProduct(ManagerRegistry $doctrine, Request $request): JsonResponse
     {
         $entityManager = $doctrine->getManager();
-
+        
         $mosque = new Mosque();
         $mosque->setName($request->request->get('name'));
         $mosque->setDescription($request->request->get('description'));
         $mosque->setAddress($request->request->get('address'));
         $mosque->setPhoneNumber($request->request->get('phone_number'));
         $mosque->setEmail($request->request->get('email'));
+
+        if ($request->request->get('facility_id')) {
+            $facility = $this->facilityRepository->find($request->request->get('facility_id'));
+            $mosque->addFacility($facility);
+        }
+
+        if ($request->request->get('khateeb_id')) {
+            $khateeb = $this->khateebRepository->find($request->request->get('khateeb_id'));
+            $mosque->addKhateeb($khateeb);
+        }
 
         // tell Doctrine you want to (eventually) save the Product (no queries yet)
         $entityManager->persist($mosque);
@@ -99,10 +113,9 @@ class MosqueController extends AbstractController
 
         return new JsonResponse([
             'success' => true,
-            JsonResponse::HTTP_OK,
             'message' => "Mosque Created with id of ".$mosque->getId(),
             'data' => $mosque,
-        ]);
+        ], JsonResponse::HTTP_OK);
     }
 
     #[Route('/api/mosques/{id}', name: 'update', methods: ['PUT'])]
@@ -114,10 +127,19 @@ class MosqueController extends AbstractController
         if (!$mosque) {
             return $this->json([    
                 'success' => false,
-                JsonResponse::HTTP_NOT_FOUND,
                 'message' => "No mosque found for id $id",
                 'data' => null,
-            ], 404);
+            ], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        if ($request->request->get('facility_id')) {
+            $facility = $this->facilityRepository->find($request->request->get('facility_id'));
+            $mosque->addFacility($facility);
+        }
+
+        if ($request->request->get('khateeb_id')) {
+            $khateeb = $this->khateebRepository->find($request->request->get('khateeb_id'));
+            $mosque->addKhateeb($khateeb);
         }
 
         $request->request->get('name') ? $mosque->setName($request->request->get('name')) : NULL;
@@ -125,15 +147,15 @@ class MosqueController extends AbstractController
         $request->request->get('address') ? $mosque->setAddress($request->request->get('address')) : NULL;
         $request->request->get('phone_number') ? $mosque->setPhoneNumber($request->request->get('phone_number')) : NULL;
         $request->request->get('email') ? $mosque->setEmail($request->request->get('email')) : NULL;
+        $request->request->get('email') ? $mosque->setEmail($request->request->get('email')) : NULL;
 
         $entityManager->flush();
 
         return $this->json([
             'success' => true,
-            JsonResponse::HTTP_OK,
             'message' => "Mosque with id of ".$mosque->getId()." has been updated successfully",
             'data' => $mosque,
-        ]);
+        ], JsonResponse::HTTP_OK);
     }
 
     #[Route('/api/mosques/{id}', name: 'delete', methods: ['DELETE'])]
@@ -145,9 +167,8 @@ class MosqueController extends AbstractController
         if (!$mosque) {
             return $this->json([    
                 'success' => false,
-                JsonResponse::HTTP_NOT_FOUND,
                 'message' => "No mosque found for id $id",
-            ], 404);
+            ], JsonResponse::HTTP_NOT_FOUND);
         }
 
         $entityManager->remove($mosque);
@@ -156,8 +177,7 @@ class MosqueController extends AbstractController
 
         return $this->json([
             'success' => true,
-            JsonResponse::HTTP_OK,
             'message' => "Mosque with id of $id has been deleted successfully",
-        ]);
+        ], JsonResponse::HTTP_OK);
     }
 }

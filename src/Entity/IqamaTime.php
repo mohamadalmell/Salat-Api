@@ -11,28 +11,28 @@ class IqamaTime
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    public $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $fajr;
+    public $fajr;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $dhuhur;
+    public $dhuhur;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $asr;
+    public $asr;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $maghrib;
+    public $maghrib;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $ishaa;
+    public $ishaa;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $day;
+    public $day;
 
     #[ORM\OneToOne(targetEntity: Mosque::class, cascade: ['persist', 'remove'])]
-    private $mosque;
+    public $mosque;
 
     public function getId(): ?int
     {

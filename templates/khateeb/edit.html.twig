@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Khateeb{% endblock %}
+
+{% block body %}
+    <h1>Edit Khateeb</h1>
+
+    {{ include('khateeb/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_khateeb_index') }}">back to list</a>
+
+    {{ include('khateeb/_delete_form.html.twig') }}
+{% endblock %}

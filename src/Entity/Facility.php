@@ -13,16 +13,16 @@ class Facility
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    public $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $description;
+    public $description;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $image;
+    public $image;
 
     #[ORM\ManyToMany(targetEntity: Mosque::class, inversedBy: 'facilities')]
-    private $Mosque;
+    public $Mosque;
 
     public function __construct()
     {

@@ -11,13 +11,13 @@ class Photo
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    public $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $image;
+    public $image;
 
     #[ORM\ManyToOne(targetEntity: Mosque::class, inversedBy: 'photos')]
-    private $mosque;
+    public $mosque;
 
     public function getId(): ?int
     {

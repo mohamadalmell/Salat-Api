@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Khateeb index{% endblock %}
+
+{% block body %}
+    <h1>Khateeb index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for khateeb in khateebs %}
+            <tr>
+                <td>{{ khateeb.id }}</td>
+                <td>{{ khateeb.name }}</td>
+                <td>
+                    <a href="{{ path('app_khateeb_show', {'id': khateeb.id}) }}">show</a>
+                    <a href="{{ path('app_khateeb_edit', {'id': khateeb.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_khateeb_new') }}">Create new</a>
+{% endblock %}

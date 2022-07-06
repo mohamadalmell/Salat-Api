@@ -18,6 +18,9 @@ class MosqueFixtures extends Fixture
         $mosque->setEmail('mohamad@gmail.com');
         $mosque->setName('Salam');
 
+        //Add data to Pivot table
+        $mosque->addKhateeb($this->getReference('khateeb_1'));
+
         $manager->persist($mosque);
 
         $manager->flush();

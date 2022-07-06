@@ -6,38 +6,39 @@ use App\Repository\MosqueRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 #[ORM\Entity(repositoryClass: MosqueRepository::class)]
-class Mosque
+class Mosque 
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    public $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $name;
+    public $name;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $description;
+    public $description;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $address;
+    public $address;
 
     #[ORM\Column(type: 'integer')]
-    private $phoneNumber;
+    public $phoneNumber;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $email;
+    public $email;
 
     #[ORM\ManyToMany(targetEntity: Facility::class, mappedBy: 'Mosque')]
-    private $facilities;
+    public $facilities;
 
     #[ORM\OneToMany(mappedBy: 'mosque', targetEntity: Photo::class)]
-    private $photos;
+    public $photos;
 
     #[ORM\ManyToMany(targetEntity: Khateeb::class, mappedBy: 'mosque')]
-    private $khateebs;
+    public $khateebs;
 
     public function __construct()
     {
@@ -111,6 +112,13 @@ class Mosque
         return $this;
     }
 
+    public function getAll() : array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name
+        ];
+    }
     /**
      * @return Collection<int, Facility>
      */
@@ -190,6 +198,33 @@ class Mosque
     {
         if ($this->khateebs->removeElement($khateeb)) {
             $khateeb->removeMosque($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Khateeb>
+     */
+    public function getYes(): Collection
+    {
+        return $this->yes;
+    }
+
+    public function addYe(Khateeb $ye): self
+    {
+        if (!$this->yes->contains($ye)) {
+            $this->yes[] = $ye;
+            $ye->addMosque($this);
+        }
+
+        return $this;
+    }
+
+    public function removeYe(Khateeb $ye): self
+    {
+        if ($this->yes->removeElement($ye)) {
+            $ye->removeMosque($this);
         }
 
         return $this;

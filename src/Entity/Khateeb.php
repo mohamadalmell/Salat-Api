@@ -13,14 +13,16 @@ class Khateeb
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    public $id;
 
-    #[ORM\ManyToMany(targetEntity: Mosque::class, inversedBy: 'khateebs')]
-    private $name;
+    #[ORM\Column(type: 'string', length: 255)]
+    public $name;
+
+    #[ORM\ManyToMany(targetEntity: Mosque::class, inversedBy: 'yes')]
+    public $mosque;
 
     public function __construct()
     {
-        $this->name = new ArrayCollection();
         $this->mosque = new ArrayCollection();
     }
 
@@ -29,30 +31,18 @@ class Khateeb
         return $this->id;
     }
 
-    /**
-     * @return Collection<int, Mosque>
-     */
-    public function getName(): Collection
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    public function addName(Mosque $name): self
+    public function setName(string $name): self
     {
-        if (!$this->name->contains($name)) {
-            $this->name[] = $name;
-        }
+        $this->name = $name;
 
         return $this;
     }
-
-    public function removeName(Mosque $name): self
-    {
-        $this->name->removeElement($name);
-
-        return $this;
-    }
-
+    
     /**
      * @return Collection<int, Mosque>
      */
@@ -76,4 +66,5 @@ class Khateeb
 
         return $this;
     }
+
 }

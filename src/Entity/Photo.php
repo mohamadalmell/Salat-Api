@@ -4,8 +4,15 @@ namespace App\Entity;
 
 use App\Repository\PhotoRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PhotoRepository::class)]
+#[UniqueEntity(
+    fields: ['image'],
+    message: 'This {{ value }} is already in use.',
+)]
+
 class Photo
 {
     #[ORM\Id]
@@ -14,6 +21,7 @@ class Photo
     public $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
     public $image;
 
     #[ORM\ManyToOne(targetEntity: Mosque::class, inversedBy: 'photos')]

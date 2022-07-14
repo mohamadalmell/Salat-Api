@@ -6,9 +6,15 @@ use App\Repository\MosqueRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use JsonSerializable;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MosqueRepository::class)]
+#[UniqueEntity(
+    fields: ['name', 'phone_number', 'email'],
+    message: 'This {{ value }} is already in use.',
+)]
+
 class Mosque 
 {
     #[ORM\Id]
@@ -17,18 +23,27 @@ class Mosque
     public $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
     public $name;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Assert\NotBlank]
     public $description;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
     public $address;
 
     #[ORM\Column(type: 'integer')]
+    #[Assert\NotBlank]
     public $phoneNumber;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Assert\NotBlank]
+    #[Assert\Email(
+        message: 'The email {{ value }} is not a valid email.',
+    )]
+    
     public $email;
 
     #[ORM\ManyToMany(targetEntity: Facility::class, mappedBy: 'Mosque')]

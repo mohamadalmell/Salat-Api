@@ -6,8 +6,15 @@ use App\Repository\AdminRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: AdminRepository::class)]
+#[UniqueEntity(
+    fields: ['email', 'username'],
+    message: 'This {{ value }} is already in use.',
+)]
+
 class Admin implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -22,9 +29,13 @@ class Admin implements UserInterface, PasswordAuthenticatedUserInterface
     private $roles = [];
 
     #[ORM\Column(type: 'string')]
+    #[Assert\NotCompromisedPassword]
     private $password;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\Email(
+        message: 'The email {{ value }} is not a valid email.',
+    )]
     private $email;
 
     #[ORM\Column(type: 'string', length: 255)]

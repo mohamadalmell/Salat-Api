@@ -6,8 +6,15 @@ use App\Repository\FacilityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: FacilityRepository::class)]
+#[UniqueEntity(
+    fields: ['name'],
+    message: 'This {{ value }} is already in use.',
+)]
+
 class Facility
 {
     #[ORM\Id]
@@ -16,9 +23,15 @@ class Facility
     public $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
+    public $name;
+
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
     public $description;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
     public $image;
 
     #[ORM\ManyToMany(targetEntity: Mosque::class, inversedBy: 'facilities')]

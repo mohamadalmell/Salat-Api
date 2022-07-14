@@ -13,8 +13,12 @@ use App\Repository\MosqueRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use PhpParser\Builder\Method;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Log\Logger;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+#[Route('/mosques')]
 class MosqueController extends AbstractController
 {
     private $mosqueRepository;
@@ -28,7 +32,7 @@ class MosqueController extends AbstractController
         $this->khateebRepository = $khateebRepository;
     }
 
-    #[Route('/api/mosques', name: 'GetAll', methods: ['GET'])]
+    #[Route('/', name: 'GetAllMosques', methods: ['GET'])]
     public function getAll(): JsonResponse
     {
         $mosques = $this->mosqueRepository->findAll();
@@ -40,8 +44,8 @@ class MosqueController extends AbstractController
         ], JsonResponse::HTTP_OK); 
     }
 
-    #[Route('/api/mosques/{id}', name: 'getOne', methods: ['GET'])]
-    public function getOne( $id): JsonResponse
+    #[Route('/{id}', name: 'getOneMosque', methods: ['GET'])]
+    public function getOne( $id, LoggerInterface $logger): JsonResponse
     {
         $mosque = $this->mosqueRepository->find($id);
 
@@ -75,7 +79,6 @@ class MosqueController extends AbstractController
         $mosque->khateebs = $khateebsList;
         $mosque->facilities = $facilitiesList;
 
-
         return $this->json([
             'success' => true,
             'message' => 'One Mosque',
@@ -83,8 +86,8 @@ class MosqueController extends AbstractController
         ], JsonResponse::HTTP_OK); 
     }
 
-    #[Route('/api/mosques', name: 'create', methods: ['POST'])]
-    public function createProduct(ManagerRegistry $doctrine, Request $request): JsonResponse
+    #[Route('', name: 'createMosque', methods: ['POST'])]
+    public function createProduct(ManagerRegistry $doctrine, Request $request, ValidatorInterface $validator): JsonResponse
     {
         $entityManager = $doctrine->getManager();
         
@@ -102,7 +105,20 @@ class MosqueController extends AbstractController
 
         if ($request->request->get('khateeb_id')) {
             $khateeb = $this->khateebRepository->find($request->request->get('khateeb_id'));
-            $mosque->addKhateeb($khateeb);
+                $mosque->addKhateeb($khateeb);
+        }
+
+        $errors = $validator->validate($mosque);
+
+        if (count($errors) > 0) {
+            /*
+            * Uses a __toString method on the $errors variable which is a
+            * ConstraintViolationList object. This gives us a nice string
+            * for debugging.
+            */
+            $errorsString = (string) $errors;
+
+            return new JsonResponse($errorsString);
         }
 
         // tell Doctrine you want to (eventually) save the Product (no queries yet)
@@ -118,7 +134,7 @@ class MosqueController extends AbstractController
         ], JsonResponse::HTTP_OK);
     }
 
-    #[Route('/api/mosques/{id}', name: 'update', methods: ['PUT'])]
+    #[Route('/{id}', name: 'updateMosque', methods: ['PUT'])]
     public function update(ManagerRegistry $doctrine, int $id, Request $request): JsonResponse
     {
         $entityManager = $doctrine->getManager();
@@ -158,7 +174,7 @@ class MosqueController extends AbstractController
         ], JsonResponse::HTTP_OK);
     }
 
-    #[Route('/api/mosques/{id}', name: 'delete', methods: ['DELETE'])]
+    #[Route('/{id}', name: 'deleteMosque', methods: ['DELETE'])]
     public function delete(ManagerRegistry $doctrine, int $id, Request $request): JsonResponse
     {
         $entityManager = $doctrine->getManager();

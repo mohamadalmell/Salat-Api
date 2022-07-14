@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\IqamaTimeRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: IqamaTimeRepository::class)]
 class IqamaTime
@@ -14,24 +15,31 @@ class IqamaTime
     public $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
     public $fajr;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
     public $dhuhur;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
     public $asr;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
     public $maghrib;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
     public $ishaa;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank]
     public $day;
 
     #[ORM\OneToOne(targetEntity: Mosque::class, cascade: ['persist', 'remove'])]
+    #[Assert\NotBlank]
     public $mosque;
 
     public function getId(): ?int

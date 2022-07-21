@@ -12,7 +12,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[ORM\Entity(repositoryClass: AdminRepository::class)]
 #[UniqueEntity(
     fields: ['email', 'username'],
-    message: 'This {{ value }} is already in use.',
+    message: 'This {{ label }} is already taken.',
 )]
 
 class Admin implements UserInterface, PasswordAuthenticatedUserInterface
@@ -20,26 +20,30 @@ class Admin implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    public $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
-    private $username;
+    #[Assert\NotBlank()]
+    public $username;
 
     #[ORM\Column(type: 'json')]
-    private $roles = [];
+    public $roles = [];
 
     #[ORM\Column(type: 'string')]
+    #[Assert\NotBlank()]
     #[Assert\NotCompromisedPassword]
-    private $password;
+    public $password;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank()]
     #[Assert\Email(
         message: 'The email {{ value }} is not a valid email.',
     )]
-    private $email;
+    public $email;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $image;
+    #[Assert\NotBlank()]
+    public $image;
 
     public function getId(): ?int
     {

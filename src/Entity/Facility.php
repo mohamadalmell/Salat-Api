@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: FacilityRepository::class)]
 #[UniqueEntity(
     fields: ['name'],
-    message: 'This {{ value }} is already in use.',
+    message: 'This {{ label }} is already taken.',
 )]
 
 class Facility

@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: PhotoRepository::class)]
 #[UniqueEntity(
     fields: ['image'],
-    message: 'This {{ value }} is already in use.',
+    message: 'This {{ label }} is already taken.',
 )]
 
 class Photo

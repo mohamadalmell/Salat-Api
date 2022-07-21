@@ -163,7 +163,6 @@ class MosqueController extends AbstractController
         $request->request->get('address') ? $mosque->setAddress($request->request->get('address')) : NULL;
         $request->request->get('phone_number') ? $mosque->setPhoneNumber($request->request->get('phone_number')) : NULL;
         $request->request->get('email') ? $mosque->setEmail($request->request->get('email')) : NULL;
-        $request->request->get('email') ? $mosque->setEmail($request->request->get('email')) : NULL;
 
         $entityManager->flush();
 

@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MosqueRepository::class)]
 #[UniqueEntity(
-    fields: ['name', 'phone_number', 'email'],
+    fields: ['name', 'phoneNumber', 'email'],
     message: 'This {{ label }} is already taken.',
 )]
 

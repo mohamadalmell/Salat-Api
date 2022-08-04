@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Khateeb;
 use App\Entity\Mosque;
-use App\Form\KhateebType;
 use App\Repository\KhateebRepository;
 use App\Repository\MosqueRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -83,21 +82,7 @@ class KhateebController extends AbstractController
 
         $errors = $validator->validate($khateeb);
 
-        if (count($errors) > 0) {
-            /*
-             * Uses a __toString method on the $errors variable which is a
-             * ConstraintViolationList object. This gives us a nice string
-             * for debugging.
-             */
-            $errorsString = (string) $errors;
-    
-            // return new JsonResponse($errorsString);
-
-            return new JsonResponse([
-                'success' => false,
-                'message' => $errorsString,
-            ], JsonResponse::HTTP_FORBIDDEN);
-        }
+        if (count($errors) > 0) return new JsonResponse($errors->getMessage->first());
 
         if ($request->request->get('mosque_id')) {
             $mosque = $this->mosqueRepository->find($request->request->get('mosque_id'));
@@ -142,15 +127,6 @@ class KhateebController extends AbstractController
         $errors = $validator->validate($khateeb);
 
         if (count($errors) > 0) {
-            /*
-             * Uses a __toString method on the $errors variable which is a
-             * ConstraintViolationList object. This gives us a nice string
-             * for debugging.
-             */
-            // $errorsString = (string) $errors;
-    
-            // return new JsonResponse($errorsString);
-
             return new JsonResponse([
                 'success' => false,
                 'message' => $errors[0]->getMessage(),

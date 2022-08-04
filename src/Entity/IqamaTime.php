@@ -38,7 +38,7 @@ class IqamaTime
     #[Assert\NotBlank]
     public $day;
 
-    #[ORM\OneToOne(targetEntity: Mosque::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(targetEntity: Mosque::class, cascade: ['persist'])]
     #[Assert\NotBlank]
     public $mosque;
 
@@ -49,72 +49,72 @@ class IqamaTime
 
     public function getFajr(): ?string
     {
-        return $this->Fajr;
+        return $this->fajr;
     }
 
-    public function setFajr(string $Fajr): self
+    public function setFajr(string $fajr): self
     {
-        $this->Fajr = $Fajr;
+        $this->fajr = $fajr;
 
         return $this;
     }
 
     public function getDhuhur(): ?string
     {
-        return $this->Dhuhur;
+        return $this->dhuhur;
     }
 
-    public function setDhuhur(string $Dhuhur): self
+    public function setDhuhur(string $dhuhur): self
     {
-        $this->Dhuhur = $Dhuhur;
+        $this->dhuhur = $dhuhur;
 
         return $this;
     }
 
     public function getAsr(): ?string
     {
-        return $this->Asr;
+        return $this->asr;
     }
 
-    public function setAsr(string $Asr): self
+    public function setAsr(string $asr): self
     {
-        $this->Asr = $Asr;
+        $this->asr = $asr;
 
         return $this;
     }
 
     public function getMaghrib(): ?string
     {
-        return $this->Maghrib;
+        return $this->maghrib;
     }
 
-    public function setMaghrib(string $Maghrib): self
+    public function setMaghrib(string $maghrib): self
     {
-        $this->Maghrib = $Maghrib;
+        $this->maghrib = $maghrib;
 
         return $this;
     }
 
     public function getIshaa(): ?string
     {
-        return $this->Ishaa;
+        return $this->ishaa;
     }
 
-    public function setIshaa(string $Ishaa): self
+    public function setIshaa(string $ishaa): self
     {
-        $this->Ishaa = $Ishaa;
+        $this->ishaa = $ishaa;
 
         return $this;
     }
 
     public function getDay(): ?string
     {
-        return $this->Day;
+        return $this->day;
     }
 
-    public function setDay(string $Day): self
+    public function setDay(string $day): self
     {
-        $this->Day = $Day;
+        $this->day = $day;
 
         return $this;
     }

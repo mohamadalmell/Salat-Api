@@ -7,15 +7,11 @@ use App\Repository\FacilityRepository;
 use App\Repository\KhateebRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-// use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\MosqueRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use PhpParser\Builder\Method;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Log\Logger;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/mosques')]
@@ -45,7 +41,7 @@ class MosqueController extends AbstractController
     }
 
     #[Route('/{id}', name: 'getOneMosque', methods: ['GET'])]
-    public function getOne( $id, LoggerInterface $logger): JsonResponse
+    public function getOne( $id): JsonResponse
     {
         $mosque = $this->mosqueRepository->find($id);
 
@@ -60,7 +56,6 @@ class MosqueController extends AbstractController
         //Listing relational arrays
         $khateebsList = [];
         $facilitiesList = [];
-        $photosList = [];
 
         //Getting relational data
         $khateebs = $mosque->getKhateebs();
@@ -111,14 +106,10 @@ class MosqueController extends AbstractController
         $errors = $validator->validate($mosque);
 
         if (count($errors) > 0) {
-            /*
-            * Uses a __toString method on the $errors variable which is a
-            * ConstraintViolationList object. This gives us a nice string
-            * for debugging.
-            */
-            $errorsString = (string) $errors;
-
-            return new JsonResponse($errorsString);
+            return new JsonResponse([
+                'success' => false,
+                'message' => $errors[0]->getMessage(),
+            ], JsonResponse::HTTP_FORBIDDEN);
         }
 
         // tell Doctrine you want to (eventually) save the Product (no queries yet)
@@ -174,7 +165,7 @@ class MosqueController extends AbstractController
     }
 
     #[Route('/{id}', name: 'deleteMosque', methods: ['DELETE'])]
-    public function delete(ManagerRegistry $doctrine, int $id, Request $request): JsonResponse
+    public function delete(ManagerRegistry $doctrine, int $id): JsonResponse
     {
         $entityManager = $doctrine->getManager();
         $mosque = $entityManager->getRepository(Mosque::class)->find($id);

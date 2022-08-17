@@ -6,6 +6,8 @@ use App\Repository\MosqueRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\JoinColumns;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -34,22 +36,20 @@ class Mosque
     #[Assert\NotBlank]
     public $address;
 
-    #[ORM\Column(type: 'integer')]
-    #[Assert\NotBlank]
+    #[ORM\Column(type: 'integer', nullable: true)]
     public $phoneNumber;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Assert\NotBlank]
     #[Assert\Email(
         message: 'The email {{ value }} is not a valid email.',
     )]
     
     public $email;
 
-    #[ORM\ManyToMany(targetEntity: Facility::class, mappedBy: 'Mosque')]
+    #[ORM\ManyToMany(targetEntity: Facility::class, mappedBy: 'mosque')]
     public $facilities;
 
-    #[ORM\OneToMany(mappedBy: 'mosque', targetEntity: Photo::class)]
+    #[ORM\OneToMany(mappedBy: 'mosque', targetEntity: Photo::class, cascade: ['remove'])]
     public $photos;
 
     #[ORM\ManyToMany(targetEntity: Khateeb::class, mappedBy: 'mosque')]
@@ -108,7 +108,7 @@ class Mosque
         return $this->phoneNumber;
     }
 
-    public function setPhoneNumber(int $phoneNumber): self
+    public function setPhoneNumber(?int $phoneNumber): self
     {
         $this->phoneNumber = $phoneNumber;
 
@@ -213,33 +213,6 @@ class Mosque
     {
         if ($this->khateebs->removeElement($khateeb)) {
             $khateeb->removeMosque($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Khateeb>
-     */
-    public function getYes(): Collection
-    {
-        return $this->yes;
-    }
-
-    public function addYe(Khateeb $ye): self
-    {
-        if (!$this->yes->contains($ye)) {
-            $this->yes[] = $ye;
-            $ye->addMosque($this);
-        }
-
-        return $this;
-    }
-
-    public function removeYe(Khateeb $ye): self
-    {
-        if ($this->yes->removeElement($ye)) {
-            $ye->removeMosque($this);
         }
 
         return $this;

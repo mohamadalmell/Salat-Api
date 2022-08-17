@@ -109,6 +109,34 @@ class PhotoController extends AbstractController
         ], JsonResponse::HTTP_OK);
     }
 
+    #[Route('/{id}', name: 'updatePhoto', methods: ['PUT'])]
+    public function update(ManagerRegistry $doctrine, int $id, Request $request): JsonResponse
+    {
+        $entityManager = $doctrine->getManager();
+        $photo = $entityManager->getRepository(Photo::class)->find($id);
+
+        if (!$photo) {
+            return $this->json([
+                'success' => false,
+                'message' => "No photo found for id $id",
+                'data' => null,
+            ], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        if ($request->request->get('mosque_id')) {
+            $mosque = $this->mosqueRepository->find($request->request->get('mosque_id'));
+            $photo->setMosque($mosque);
+        }
+        
+        $entityManager->flush();
+
+        return $this->json([
+            'success' => true,
+            'message' => "Photo with id of " . $photo->getId() . " has been updated successfully",
+            'data' => $photo,
+        ], JsonResponse::HTTP_OK);
+    }
+
     #[Route('/{id}', name: 'deletePhoto', methods: ['DELETE'])]
     public function delete(ManagerRegistry $doctrine, int $id): JsonResponse
     {

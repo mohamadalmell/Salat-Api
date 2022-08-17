@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: FacilityRepository::class)]
 #[UniqueEntity(
     fields: ['name'],
-    message: 'This {{ label }} is already taken.',
+    message: 'This {{ value }} is already taken.',
 )]
 
 class Facility
@@ -35,11 +35,11 @@ class Facility
     public $image;
 
     #[ORM\ManyToMany(targetEntity: Mosque::class, inversedBy: 'facilities')]
-    public $Mosque;
+    public $mosque;
 
     public function __construct()
     {
-        $this->Mosque = new ArrayCollection();
+        $this->mosque = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -88,13 +88,13 @@ class Facility
      */
     public function getMosque(): Collection
     {
-        return $this->Mosque;
+        return $this->mosque;
     }
 
     public function addMosque(Mosque $mosque): self
     {
-        if (!$this->Mosque->contains($mosque)) {
-            $this->Mosque[] = $mosque;
+        if (!$this->mosque->contains($mosque)) {
+            $this->mosque[] = $mosque;
         }
 
         return $this;
@@ -102,7 +102,7 @@ class Facility
 
     public function removeMosque(Mosque $mosque): self
     {
-        $this->Mosque->removeElement($mosque);
+        $this->mosque->removeElement($mosque);
 
         return $this;
     }

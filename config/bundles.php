@@ -18,4 +18,5 @@ return [
     Sonata\DoctrineORMAdminBundle\SonataDoctrineORMAdminBundle::class => ['all' => true],
     Sonata\Doctrine\Bridge\Symfony\SonataDoctrineBundle::class => ['all' => true],
     Symfony\Bundle\DebugBundle\DebugBundle::class => ['dev' => true],
+    Nelmio\CorsBundle\NelmioCorsBundle::class => ['all' => true],
 ];

@@ -42,7 +42,6 @@ class Admin implements UserInterface, PasswordAuthenticatedUserInterface
     public $email;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Assert\NotBlank()]
     public $image;
 
     public function getId(): ?int

@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\KhateebRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -22,13 +23,17 @@ class Khateeb
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     public $id;
+    
+    #[ORM\Column(type: 'string')]
+    public $date;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Assert\NotBlank]
     public $name;
 
-    #[ORM\ManyToMany(targetEntity: Mosque::class, inversedBy: 'yes')]
+    #[ORM\ManyToMany(targetEntity: Mosque::class, inversedBy: 'khateebs')]
     public $mosque;
+
 
     public function __construct()
     {
@@ -72,6 +77,18 @@ class Khateeb
     public function removeMosque(Mosque $mosque): self
     {
         $this->mosque->removeElement($mosque);
+
+        return $this;
+    }
+
+    public function getDate(): ?string
+    {
+        return $this->date;
+    }
+
+    public function setDate(string $date): self
+    {
+        $this->date = $date;
 
         return $this;
     }

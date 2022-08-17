@@ -25,7 +25,7 @@ class Photo
     public $image;
 
     #[ORM\ManyToOne(targetEntity: Mosque::class, inversedBy: 'photos')]
-    public $mosque;
+    private $mosque;
 
     public function getId(): ?int
     {

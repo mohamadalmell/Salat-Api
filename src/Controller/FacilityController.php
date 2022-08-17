@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Facility;
 use App\Repository\FacilityRepository;
+use App\Repository\MosqueRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,16 +16,34 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class FacilityController extends AbstractController
 {
     private $facilityRepository;
+    private $mosqueRepository;
 
-    public function __construct(FacilityRepository $facilityRepository)
+    public function __construct(FacilityRepository $facilityRepository, MosqueRepository $mosqueRepository)
     {
         $this->facilityRepository = $facilityRepository;
+        $this->mosqueRepository = $mosqueRepository;
     }
 
     #[Route('/', name: 'GetAllFacilities', methods: ['GET'])]
     public function getAll(): JsonResponse
     {
         $facilities = $this->facilityRepository->findAll();
+
+        foreach ($facilities as $facility) {
+            //Listing relational arrays
+            $mosqueList = [];
+
+            //Getting relational data
+            $mosques = $facility->getMosque();
+
+            //Looping over relational arrays
+            foreach ($mosques as $mosque) {
+                array_push($mosqueList, $mosque);
+            }
+
+            //Setting data 
+            $facility->mosque = $mosqueList;
+        }
 
         return $this->json([
             'success' => true,
@@ -34,23 +53,23 @@ class FacilityController extends AbstractController
     }
 
     #[Route('/{id}', name: 'getOneFacility', methods: ['GET'])]
-    public function getOne($id): JsonResponse
+    public function getOne( $id): JsonResponse
     {
         $facility = $this->facilityRepository->find($id);
 
         if (!$facility) {
-            return $this->json([
+            return $this->json([    
                 'success' => false,
-                'message' => "No facility found for id $id",
+                'message' => "No Facility found for id $id",
                 'data' => null,
             ], JsonResponse::HTTP_NOT_FOUND);
         }
-
+        
         return $this->json([
             'success' => true,
             'message' => 'One Facility',
             'data' => $facility,
-        ], JsonResponse::HTTP_OK);
+        ], JsonResponse::HTTP_OK); 
     }
 
     #[Route('', name: 'createFacility', methods: ['POST'])]
@@ -59,8 +78,13 @@ class FacilityController extends AbstractController
         $entityManager = $doctrine->getManager();
 
         $facility = new Facility();
-        $facility->setName($request->request->get('description'));
+        $facility->setName($request->request->get('name'));
         $facility->setDescription($request->request->get('description'));
+
+        if ($request->request->get('mosque_id')) {
+            $mosque = $this->mosqueRepository->find($request->request->get('mosque_id'));
+            $facility->addMosque($mosque);
+        }
 
         //Image upload
         $file = $request->files->get('image');
@@ -89,7 +113,7 @@ class FacilityController extends AbstractController
                 'message' => $errors[0]->getMessage(),
             ], JsonResponse::HTTP_FORBIDDEN);
         }
-        
+
         // tell Doctrine you want to (eventually) save the Product (no queries yet)
         $entityManager->persist($facility);
 
@@ -110,7 +134,7 @@ class FacilityController extends AbstractController
         $facility = $entityManager->getRepository(Facility::class)->find($id);
 
         if (!$facility) {
-            return $this->json([    
+            return $this->json([
                 'success' => false,
                 'message' => "No facility found for id $id",
                 'data' => null,
@@ -120,11 +144,16 @@ class FacilityController extends AbstractController
         $request->request->get('name') && $facility->setName($request->request->get('name'));
         $request->request->get('description') && $facility->setDescription($request->request->get('description'));
 
+        if ($request->request->get('mosque_id')) {
+            $mosque = $this->mosqueRepository->find($request->request->get('mosque_id'));
+            $facility->addMosque($mosque);
+        }
+        
         $entityManager->flush();
 
         return $this->json([
             'success' => true,
-            'message' => "Facility with id of ".$facility->getId()." has been updated successfully",
+            'message' => "Facility with id of " . $facility->getId() . " has been updated successfully",
             'data' => $facility,
         ], JsonResponse::HTTP_OK);
     }
@@ -136,7 +165,7 @@ class FacilityController extends AbstractController
         $facility = $entityManager->getRepository(Facility::class)->find($id);
 
         if (!$facility) {
-            return $this->json([    
+            return $this->json([
                 'success' => false,
                 'message' => "No facility found for id $id",
             ], JsonResponse::HTTP_NOT_FOUND);

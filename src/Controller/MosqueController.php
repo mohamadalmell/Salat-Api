@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\MosqueRepository;
+use Doctrine\ORM\Tools\AttachEntityListenersListener;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,6 +34,29 @@ class MosqueController extends AbstractController
     {
         $mosques = $this->mosqueRepository->findAll();
 
+        foreach ($mosques as $mosque) {
+            //Listing relational arrays
+            $facilitiesList = [];
+            $photosList = [];
+
+            //Getting relational data
+            $facilities = $mosque->getFacilities();
+            $photos = $mosque->getPhotos();
+
+            //Looping over relational arrays
+            foreach ($facilities as $facility) {
+                array_push($facilitiesList, $facility);
+            }
+
+            foreach ($photos as $photo) {
+                array_push($photosList, $photo);
+            }
+
+            //Setting data 
+            $mosque->facilities = $facilitiesList;
+            $mosque->photos = $photosList;
+        }
+
         return $this->json([
             'success' => true,
             'message' => 'All Mosques',
@@ -54,24 +78,17 @@ class MosqueController extends AbstractController
         }
         
         //Listing relational arrays
-        $khateebsList = [];
         $facilitiesList = [];
 
         //Getting relational data
-        $khateebs = $mosque->getKhateebs();
         $facilities = $mosque->getFacilities();
 
         //Looping over relational arrays
-        foreach ($khateebs as $khateeb) {
-            array_push($khateebsList, $khateeb);
-         }
-
         foreach ($facilities as $facility) {
             array_push($facilitiesList, $facility);
         }
 
         //Setting data 
-        $mosque->khateebs = $khateebsList;
         $mosque->facilities = $facilitiesList;
 
         return $this->json([
@@ -90,7 +107,7 @@ class MosqueController extends AbstractController
         $mosque->setName($request->request->get('name'));
         $mosque->setDescription($request->request->get('description'));
         $mosque->setAddress($request->request->get('address'));
-        $mosque->setPhoneNumber($request->request->get('phone_number'));
+        $request->request->get('phone_number') && $mosque->setPhoneNumber($request->request->get('phone_number'));
         $mosque->setEmail($request->request->get('email'));
 
         if ($request->request->get('facility_id')) {
